@@ -151,9 +151,49 @@ body {
 }
 
 .charts {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chart-group {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+}
+
+.chart-group summary {
+  cursor: pointer;
+  padding: 0.9rem 1rem;
+  font-weight: 700;
+  color: var(--text);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* hide the native disclosure triangle so our own marker is the only one */
+.chart-group summary::-webkit-details-marker {
+  display: none;
+}
+
+.chart-group summary::before {
+  content: "\25B8"; /* ▸ */
+  display: inline-block;
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+}
+
+.chart-group[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.chart-group-body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.25rem;
+  padding: 0 1rem 1rem;
 }
 
 .chart-card {

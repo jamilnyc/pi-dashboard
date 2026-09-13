@@ -102,34 +102,54 @@
     </section>
 
     <section class="charts" aria-label="Historical stats">
-      <div class="chart-card">
-        <h2>CPU usage</h2>
-        <%= line_chart @query.cpu_series, **time_axis, suffix: "%", min: 0, max: 100, colors: [pi_red] %>
-      </div>
+      <details class="chart-group" open>
+        <summary>CPU</summary>
+        <div class="chart-group-body">
+          <div class="chart-card">
+            <h2>CPU usage</h2>
+            <%= line_chart @query.cpu_series, **time_axis, suffix: "%", min: 0, max: 100, colors: [pi_red] %>
+          </div>
 
-      <div class="chart-card">
-        <h2>Memory usage</h2>
-        <%= line_chart @query.memory_series, **time_axis, suffix: "%", min: 0, max: 100, colors: [pi_green] %>
-      </div>
-
-      <div class="chart-card">
-        <h2>Temperature</h2>
-        <%= line_chart @query.temperature_series, **time_axis, suffix: "°C", colors: [pi_red] %>
-      </div>
-
-      <% @query.disk_series_by_mount_point.each do |mount_point, series| %>
-        <div class="chart-card">
-          <h2>Disk usage &mdash; <%= mount_point %></h2>
-          <%= line_chart(series, **time_axis, suffix: "%", min: 0, max: 100, colors: [pi_blue]) %>
+          <div class="chart-card">
+            <h2>Temperature</h2>
+            <%= line_chart @query.temperature_series, **time_axis, suffix: "°C", colors: [pi_red] %>
+          </div>
         </div>
-      <% end %>
+      </details>
 
-      <% @query.network_series_by_interface.each do |interface, series| %>
-        <div class="chart-card">
-          <h2>Network &mdash; <%= interface %></h2>
-          <%= line_chart(series, **time_axis, suffix: "Bps", colors: [pi_green, pi_red]) %>
+      <details class="chart-group" open>
+        <summary>Memory</summary>
+        <div class="chart-group-body">
+          <div class="chart-card">
+            <h2>Memory usage</h2>
+            <%= line_chart @query.memory_series, **time_axis, suffix: "%", min: 0, max: 100, colors: [pi_green] %>
+          </div>
         </div>
-      <% end %>
+      </details>
+
+      <details class="chart-group" open>
+        <summary>Disk</summary>
+        <div class="chart-group-body">
+          <% @query.disk_series_by_mount_point.each do |mount_point, series| %>
+            <div class="chart-card">
+              <h2>Disk usage &mdash; <%= mount_point %></h2>
+              <%= line_chart(series, **time_axis, suffix: "%", min: 0, max: 100, colors: [pi_blue]) %>
+            </div>
+          <% end %>
+        </div>
+      </details>
+
+      <details class="chart-group" open>
+        <summary>Networking</summary>
+        <div class="chart-group-body">
+          <% @query.network_series_by_interface.each do |interface, series| %>
+            <div class="chart-card">
+              <h2>Network &mdash; <%= interface %></h2>
+              <%= line_chart(series, **time_axis, suffix: "Bps", colors: [pi_green, pi_red]) %>
+            </div>
+          <% end %>
+        </div>
+      </details>
     </section>
   <% end %>
 
