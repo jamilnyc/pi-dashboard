@@ -1,0 +1,94 @@
+<% content_for :title, "Pi Stats Dashboard" %>
+<% pi_red = "#c51a4a"; pi_green = "#75b928"; pi_charcoal = "#2b2b2b" %>
+
+<div class="dashboard">
+  <header class="dashboard-header">
+    <h1>
+      <span class="pi-logo" aria-hidden="true"></span>
+      Raspberry Pi Dashboard
+    </h1>
+
+    <nav class="range-selector" aria-label="Time range">
+      <% DashboardController::RANGES.each_key do |key| %>
+        <%= link_to key, root_path(range: key), class: "range-link #{"is-active" if key == @range_key}" %>
+      <% end %>
+    </nav>
+  </header>
+
+  <% if (snapshot = @query.latest_snapshot).nil? %>
+    <p class="empty-state">
+      No stats have been collected yet. The background job polls every 60 seconds &mdash;
+      check back in a minute, or run <code>Stats::SnapshotCollector.new.call</code> from the console.
+    </p>
+  <% else %>
+    <section class="tiles" aria-label="Current stats">
+      <div class="tile">
+        <span class="tile-label">CPU</span>
+        <span class="tile-value"><%= snapshot.cpu_percent ? number_to_percentage(snapshot.cpu_percent, precision: 1) : "&ndash;".html_safe %></span>
+      </div>
+      <div class="tile">
+        <span class="tile-label">Memory</span>
+        <span class="tile-value"><%= number_to_percentage(snapshot.mem_percent, precision: 1) %></span>
+        <span class="tile-sub"><%= number_to_human_size(snapshot.mem_used_kb * 1024) %> / <%= number_to_human_size(snapshot.mem_total_kb * 1024) %></span>
+      </div>
+      <div class="tile">
+        <span class="tile-label">Temperature</span>
+        <span class="tile-value"><%= snapshot.cpu_temp_celsius ? "#{number_with_precision(snapshot.cpu_temp_celsius, precision: 1)}°C" : "&ndash;".html_safe %></span>
+      </div>
+      <% @query.latest_disk_usages.each do |disk| %>
+        <div class="tile">
+          <span class="tile-label"><%= disk.mount_point %></span>
+          <span class="tile-value"><%= number_to_percentage(disk.use_percent, precision: 1) %></span>
+          <span class="tile-sub"><%= number_to_human_size(disk.used_bytes) %> / <%= number_to_human_size(disk.total_bytes) %></span>
+        </div>
+      <% end %>
+      <% @query.latest_network_usages.each do |iface| %>
+        <div class="tile">
+          <span class="tile-label"><%= iface.interface %></span>
+          <span class="tile-value">
+            <span class="net-rate">&darr; <%= iface.rx_bytes_per_sec ? number_to_human_size(iface.rx_bytes_per_sec) + "/s" : "&ndash;".html_safe %></span>
+            <span class="net-rate">&uarr; <%= iface.tx_bytes_per_sec ? number_to_human_size(iface.tx_bytes_per_sec) + "/s" : "&ndash;".html_safe %></span>
+          </span>
+          <span class="tile-sub">
+            &darr; <%= number_to_human_size(iface.rx_bytes_total) %> total &middot;
+            &uarr; <%= number_to_human_size(iface.tx_bytes_total) %> total
+          </span>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="charts" aria-label="Historical stats">
+      <div class="chart-card">
+        <h2>CPU usage</h2>
+        <%= line_chart @query.cpu_series, xtype: "string", suffix: "%", min: 0, max: 100, colors: [pi_red] %>
+      </div>
+
+      <div class="chart-card">
+        <h2>Memory usage</h2>
+        <%= line_chart @query.memory_series, xtype: "string", suffix: "%", min: 0, max: 100, colors: [pi_green] %>
+      </div>
+
+      <div class="chart-card">
+        <h2>Temperature</h2>
+        <%= line_chart @query.temperature_series, xtype: "string", suffix: "°C", colors: [pi_red] %>
+      </div>
+
+      <% @query.disk_series_by_mount_point.each do |mount_point, series| %>
+        <div class="chart-card">
+          <h2>Disk usage &mdash; <%= mount_point %></h2>
+          <%= line_chart({ "Used %" => series }, xtype: "string", suffix: "%", min: 0, max: 100, colors: [pi_charcoal]) %>
+        </div>
+      <% end %>
+
+      <% @query.network_series_by_interface.each do |interface, series| %>
+        <div class="chart-card">
+          <h2>Network &mdash; <%= interface %></h2>
+          <%= line_chart(
+                { "Download (↓)" => series[:rx], "Upload (↑)" => series[:tx] },
+                xtype: "string", suffix: "Bps", colors: [pi_green, pi_red]
+              ) %>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
+</div>
