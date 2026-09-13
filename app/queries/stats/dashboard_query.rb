@@ -65,6 +65,8 @@ module Stats
     end
 
     # => { "eth0" => [{ name: "Download", data: [...] }, { name: "Upload", data: [...] }], ... }
+    # Values are in KB/s (raw storage is bytes/sec) to keep the chart's
+    # y-axis in a human-friendly range instead of the low thousands.
     def network_series_by_interface
       NetworkUsage
         .joins(:stat_snapshot)
@@ -74,8 +76,8 @@ module Stats
         .group_by { |iface, _, _, _| iface }
         .transform_values do |rows|
           [
-            { name: "Download (↓)", data: rows.map { |_, time, rx, _| [label(time), rx] } },
-            { name: "Upload (↑)", data: rows.map { |_, time, _, tx| [label(time), tx] } }
+            { name: "Download (↓)", data: rows.map { |_, time, rx, _| [label(time), kb_per_sec(rx)] } },
+            { name: "Upload (↑)", data: rows.map { |_, time, _, tx| [label(time), kb_per_sec(tx)] } }
           ]
         end
     end
@@ -84,6 +86,10 @@ module Stats
 
     def pairs_for(column)
       snapshots_scope.pluck(:recorded_at, column).map { |t, v| [label(t), v] }
+    end
+
+    def kb_per_sec(bytes_per_sec)
+      bytes_per_sec && bytes_per_sec / 1024.0
     end
 
     def snapshots_scope

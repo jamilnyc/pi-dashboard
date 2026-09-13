@@ -171,7 +171,7 @@
           <% @query.network_series_by_interface.each do |interface, series| %>
             <div class="chart-card">
               <h2>Network &mdash; <%= interface %></h2>
-              <%= line_chart(series, **time_axis, suffix: "Bps", colors: [pi_green, pi_red]) %>
+              <%= line_chart(series, **time_axis, suffix: "KBps", colors: [pi_green, pi_red]) %>
             </div>
           <% end %>
         </div>

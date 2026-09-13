@@ -8,7 +8,8 @@ RSpec.describe Stats::DashboardQuery do
       mem_total_kb: 1000, mem_available_kb: 500, mem_used_kb: 500, mem_percent: mem_percent
     )
     snapshot.disk_usages.create!(device: "/dev/sda1", fs_type: "ext4", mount_point: "/", total_bytes: 100, used_bytes: 10, available_bytes: 90, use_percent: 10.0)
-    snapshot.network_usages.create!(interface: "eth0", rx_bytes_total: 100, tx_bytes_total: 100, rx_bytes_per_sec: 5.0, tx_bytes_per_sec: 2.0)
+    # 5120/2048 bytes/sec so the KB/s conversion in network_series_by_interface lands on round numbers (5.0/2.0)
+    snapshot.network_usages.create!(interface: "eth0", rx_bytes_total: 100, tx_bytes_total: 100, rx_bytes_per_sec: 5120.0, tx_bytes_per_sec: 2048.0)
     snapshot
   end
 
@@ -58,7 +59,7 @@ RSpec.describe Stats::DashboardQuery do
   end
 
   describe "#network_series_by_interface" do
-    it "returns each interface already mapped to a two-series (rx/tx) chart-ready array" do
+    it "returns each interface already mapped to a two-series (rx/tx) chart-ready array, converted to KB/s" do
       create_snapshot(recorded_at: 1.minute.ago, cpu_percent: 1.0)
 
       result = described_class.new(since: 1.hour.ago).network_series_by_interface
@@ -68,6 +69,18 @@ RSpec.describe Stats::DashboardQuery do
       expect(names).to eq([ "Download (↓)", "Upload (↑)" ])
       expect(result["eth0"][0][:data].map(&:last)).to eq([ 5.0 ])
       expect(result["eth0"][1][:data].map(&:last)).to eq([ 2.0 ])
+    end
+
+    it "keeps a nil rate (no previous poll to diff against) as nil rather than 0" do
+      snapshot = StatSnapshot.create!(
+        recorded_at: 1.minute.ago,
+        cpu_raw_total: 1, cpu_raw_idle: 1, mem_total_kb: 1000, mem_available_kb: 500, mem_used_kb: 500, mem_percent: 50.0
+      )
+      snapshot.network_usages.create!(interface: "eth0", rx_bytes_total: 100, tx_bytes_total: 100, rx_bytes_per_sec: nil, tx_bytes_per_sec: nil)
+
+      result = described_class.new(since: 1.hour.ago).network_series_by_interface
+
+      expect(result["eth0"][0][:data].map(&:last)).to eq([ nil ])
     end
   end
 end
