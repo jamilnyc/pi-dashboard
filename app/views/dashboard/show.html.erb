@@ -102,17 +102,14 @@
       <% @query.disk_series_by_mount_point.each do |mount_point, series| %>
         <div class="chart-card">
           <h2>Disk usage &mdash; <%= mount_point %></h2>
-          <%= line_chart({ "Used %" => series }, **time_axis, xtype: "string", suffix: "%", min: 0, max: 100, colors: [pi_charcoal]) %>
+          <%= line_chart(series, **time_axis, xtype: "string", suffix: "%", min: 0, max: 100, colors: [pi_charcoal]) %>
         </div>
       <% end %>
 
       <% @query.network_series_by_interface.each do |interface, series| %>
         <div class="chart-card">
           <h2>Network &mdash; <%= interface %></h2>
-          <%= line_chart(
-                { "Download (↓)" => series[:rx], "Upload (↑)" => series[:tx] },
-                **time_axis, xtype: "string", suffix: "Bps", colors: [pi_green, pi_red]
-              ) %>
+          <%= line_chart(series, **time_axis, xtype: "string", suffix: "Bps", colors: [pi_green, pi_red]) %>
         </div>
       <% end %>
     </section>
