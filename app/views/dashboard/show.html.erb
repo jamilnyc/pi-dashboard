@@ -114,6 +114,14 @@
             <h2>Temperature</h2>
             <%= line_chart @query.temperature_series, **time_axis, suffix: "°C", colors: [pi_red] %>
           </div>
+
+          <div class="chart-card">
+            <h2>Top CPU consumers</h2>
+            <%= render "process_table",
+                  processes: @top_cpu_processes,
+                  value_label: "CPU",
+                  value_for: ->(process) { number_to_percentage(process.cpu_percent, precision: 1) } %>
+          </div>
         </div>
       </details>
 
@@ -127,28 +135,10 @@
 
           <div class="chart-card">
             <h2>Top memory consumers</h2>
-            <% if @top_processes.any? %>
-              <table class="process-table">
-                <thead>
-                  <tr>
-                    <th>PID</th>
-                    <th>Process</th>
-                    <th>Memory</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% @top_processes.each do |process| %>
-                    <tr>
-                      <td><%= process.pid %></td>
-                      <td><%= process.command %></td>
-                      <td><%= number_to_human_size(process.rss_kb * 1024) %> (<%= number_to_percentage(process.percent, precision: 1) %>)</td>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            <% else %>
-              <p class="empty-state">Unable to read the process list.</p>
-            <% end %>
+            <%= render "process_table",
+                  processes: @top_memory_processes,
+                  value_label: "Memory",
+                  value_for: ->(process) { "#{number_to_human_size(process.rss_kb * 1024)} (#{number_to_percentage(process.mem_percent, precision: 1)})" } %>
           </div>
         </div>
       </details>

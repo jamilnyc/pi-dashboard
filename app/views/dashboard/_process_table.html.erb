@@ -1,0 +1,24 @@
+<%# locals: processes (Array<Stats::TopProcessesReader::ProcessInfo>), value_label (String),
+    value_for (Proc taking a ProcessInfo, returning the cell content for the metric column) %>
+<% if processes.any? %>
+  <table class="process-table">
+    <thead>
+      <tr>
+        <th>PID</th>
+        <th>Process</th>
+        <th><%= value_label %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% processes.each do |process| %>
+        <tr>
+          <td><%= process.pid %></td>
+          <td><%= process.command %></td>
+          <td><%= value_for.call(process) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="empty-state">Unable to read the process list.</p>
+<% end %>
