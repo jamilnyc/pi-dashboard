@@ -91,4 +91,16 @@
       <% end %>
     </section>
   <% end %>
+
+  <footer class="dashboard-footer">
+    <span><%= @system_info.model || "Unknown model" %></span>
+    <span aria-hidden="true">&middot;</span>
+    <span><%= @system_info.cpu_cores ? pluralize(@system_info.cpu_cores, "core") : "Unknown cores" %></span>
+    <span aria-hidden="true">&middot;</span>
+    <span><%= @system_info.os_version || "Unknown OS" %></span>
+    <span aria-hidden="true">&middot;</span>
+    <span>Kernel <%= @system_info.kernel_version || "unknown" %></span>
+    <span aria-hidden="true">&middot;</span>
+    <span><%= @system_info.hostname %></span>
+  </footer>
 </div>
