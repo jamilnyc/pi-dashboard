@@ -215,8 +215,8 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 3px;
-  background: var(--accent);
+  height: 6px;
+  background: var(--pi-green);
   transform-origin: left;
   animation-name: refresh-drain;
   animation-timing-function: linear;
@@ -224,12 +224,24 @@ body {
   z-index: 1000;
 }
 
+/* A spatial left-to-right gradient wouldn't read as a countdown here: the
+   bar shrinks from the right (transform-origin: left), so a fixed gradient
+   would just crop away its red end first, leaving the visible sliver
+   green the whole time. Animating background-color instead -- alongside
+   the same scaleX shrink -- ties the color to elapsed time, not position.
+   The amber midpoint avoids the muddy brown a straight green->red RGB
+   interpolation would pass through. */
 @keyframes refresh-drain {
-  from {
+  0% {
     transform: scaleX(1);
+    background-color: var(--pi-green);
   }
-  to {
+  50% {
+    background-color: #e0a526;
+  }
+  100% {
     transform: scaleX(0);
+    background-color: var(--pi-red);
   }
 }
 
