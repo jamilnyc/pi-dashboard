@@ -170,6 +170,35 @@ body {
   color: var(--text);
 }
 
+.refresh-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--accent);
+  transform-origin: left;
+  animation-name: refresh-drain;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  z-index: 1000;
+}
+
+@keyframes refresh-drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refresh-progress {
+    animation: none;
+  }
+}
+
 .dashboard-footer {
   margin-top: 2rem;
   padding-top: 1rem;
