@@ -5,6 +5,8 @@ Linux box): current and historical CPU, memory, disk, network, and
 temperature stats, with interactive charts, backed by SQLite. No external
 services required — everything runs in a single process.
 
+![Dashboard screenshot](screenshots/dashboard.png)
+
 ## Features
 
 - **Live tiles** for CPU, memory, temperature, every mounted filesystem, and

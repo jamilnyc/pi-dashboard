@@ -33,4 +33,6 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
-screenshots/
+# Ad-hoc debugging screenshots aren't for the repo, but README images are.
+screenshots/*
+!screenshots/dashboard.png
