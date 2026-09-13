@@ -1,5 +1,16 @@
 <% content_for :title, "Pi Stats Dashboard" %>
 <% pi_red = "#c51a4a"; pi_green = "#75b928"; pi_charcoal = "#2b2b2b" %>
+<%
+  # With xtype: "string", each chart's x-axis is a plain category scale with
+  # one tick per poll -- up to 1,440 of them on the 24h range. Chart.js's
+  # autoSkip then discards nearly all of them to avoid overlap, leaving the
+  # axis looking blank. Force a small, always-legible, horizontal tick count
+  # instead, and label the axis so it reads clearly as time.
+  time_axis = {
+    xtitle: "Time",
+    library: { scales: { x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } } } }
+  }
+%>
 
 <div class="dashboard">
   <header class="dashboard-header">
@@ -60,23 +71,23 @@
     <section class="charts" aria-label="Historical stats">
       <div class="chart-card">
         <h2>CPU usage</h2>
-        <%= line_chart @query.cpu_series, xtype: "string", suffix: "%", min: 0, max: 100, colors: [pi_red] %>
+        <%= line_chart @query.cpu_series, **time_axis, xtype: "string", suffix: "%", min: 0, max: 100, colors: [pi_red] %>
       </div>
 
       <div class="chart-card">
         <h2>Memory usage</h2>
-        <%= line_chart @query.memory_series, xtype: "string", suffix: "%", min: 0, max: 100, colors: [pi_green] %>
+        <%= line_chart @query.memory_series, **time_axis, xtype: "string", suffix: "%", min: 0, max: 100, colors: [pi_green] %>
       </div>
 
       <div class="chart-card">
         <h2>Temperature</h2>
-        <%= line_chart @query.temperature_series, xtype: "string", suffix: "°C", colors: [pi_red] %>
+        <%= line_chart @query.temperature_series, **time_axis, xtype: "string", suffix: "°C", colors: [pi_red] %>
       </div>
 
       <% @query.disk_series_by_mount_point.each do |mount_point, series| %>
         <div class="chart-card">
           <h2>Disk usage &mdash; <%= mount_point %></h2>
-          <%= line_chart({ "Used %" => series }, xtype: "string", suffix: "%", min: 0, max: 100, colors: [pi_charcoal]) %>
+          <%= line_chart({ "Used %" => series }, **time_axis, xtype: "string", suffix: "%", min: 0, max: 100, colors: [pi_charcoal]) %>
         </div>
       <% end %>
 
@@ -85,7 +96,7 @@
           <h2>Network &mdash; <%= interface %></h2>
           <%= line_chart(
                 { "Download (↓)" => series[:rx], "Upload (↑)" => series[:tx] },
-                xtype: "string", suffix: "Bps", colors: [pi_green, pi_red]
+                **time_axis, xtype: "string", suffix: "Bps", colors: [pi_green, pi_red]
               ) %>
         </div>
       <% end %>
