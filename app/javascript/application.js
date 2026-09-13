@@ -8,3 +8,4 @@ import "controllers"
 // Chart.js via that global.
 import "chart.js"
 import "chartkick"
+import "chart_crosshair"
