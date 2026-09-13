@@ -17,7 +17,17 @@ function drawCrosshair(chart) {
   const xScale = chart.scales?.x
   if (!xScale) return
 
-  const x = xScale.getPixelForTick(index)
+  // getPixelForTick(i) indexes into the scale's *currently rendered* tick
+  // array -- i.e. AFTER autoSkip has thinned it down to maxTicksLimit (8,
+  // see time_axis in the view), not the full per-poll data array. Passing
+  // our raw data-point index into it looks plausible for small indices but
+  // is really "the pixel for the i-th SURVIVING tick", which for index 7
+  // might already be data point ~49 -- exactly why the line raced ahead of
+  // the mouse and went off-screen a handful of points in. getPixelForValue
+  // treats a numeric argument as a raw category value (our actual data
+  // index) against the scale's full range, unaffected by which ticks
+  // autoSkip chose to label.
+  const x = xScale.getPixelForValue(index)
   if (x == null || Number.isNaN(x)) return
 
   const { top, bottom } = chart.chartArea
