@@ -124,6 +124,32 @@
             <h2>Memory usage</h2>
             <%= line_chart @query.memory_series, **time_axis, suffix: "%", min: 0, max: 100, colors: [pi_green] %>
           </div>
+
+          <div class="chart-card">
+            <h2>Top memory consumers</h2>
+            <% if @top_processes.any? %>
+              <table class="process-table">
+                <thead>
+                  <tr>
+                    <th>PID</th>
+                    <th>Process</th>
+                    <th>Memory</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @top_processes.each do |process| %>
+                    <tr>
+                      <td><%= process.pid %></td>
+                      <td><%= process.command %></td>
+                      <td><%= number_to_human_size(process.rss_kb * 1024) %> (<%= number_to_percentage(process.percent, precision: 1) %>)</td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            <% else %>
+              <p class="empty-state">Unable to read the process list.</p>
+            <% end %>
+          </div>
         </div>
       </details>
 

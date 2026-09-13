@@ -6,5 +6,6 @@ class DashboardController < ApplicationController
     @range_key = RANGES.key?(params[:range]) ? params[:range] : DEFAULT_RANGE
     @query = Stats::DashboardQuery.new(since: RANGES.fetch(@range_key).ago)
     @system_info = Stats::SystemInfoReader.new.call
+    @top_processes = Stats::TopProcessesReader.new.call
   end
 end

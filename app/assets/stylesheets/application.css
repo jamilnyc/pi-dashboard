@@ -210,6 +210,34 @@ body {
   color: var(--text);
 }
 
+.process-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.process-table th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 0 0.5rem 0.5rem 0;
+}
+
+.process-table td {
+  padding: 0.4rem 0.5rem 0.4rem 0;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+}
+
+.process-table td:first-child,
+.process-table th:first-child {
+  color: var(--text-muted);
+  width: 4rem;
+}
+
 .refresh-progress {
   position: fixed;
   top: 0;
