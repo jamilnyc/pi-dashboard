@@ -45,18 +45,28 @@
   }
 %>
 
-<div class="dashboard">
+<div class="dashboard" data-controller="width-toggle">
   <header class="dashboard-header">
     <h1>
       <span class="pi-logo" aria-hidden="true"></span>
       Raspberry Pi Dashboard
     </h1>
 
-    <nav class="range-selector" aria-label="Time range">
-      <% DashboardController::RANGES.each_key do |key| %>
-        <%= link_to key, root_path(range: key), class: "range-link #{"is-active" if key == @range_key}" %>
-      <% end %>
-    </nav>
+    <div class="header-controls">
+      <nav class="range-selector" aria-label="Time range">
+        <% DashboardController::RANGES.each_key do |key| %>
+          <%= link_to key, root_path(range: key), class: "range-link #{"is-active" if key == @range_key}" %>
+        <% end %>
+      </nav>
+
+      <button
+        type="button"
+        class="width-toggle-button"
+        data-width-toggle-target="button"
+        data-action="click->width-toggle#toggle"
+        aria-pressed="false"
+      >Full width</button>
+    </div>
   </header>
 
   <% if (snapshot = @query.latest_snapshot).nil? %>

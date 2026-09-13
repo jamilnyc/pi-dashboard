@@ -52,6 +52,10 @@ body {
   padding: 1rem 1.25rem 3rem;
 }
 
+.dashboard.full-width {
+  max-width: none;
+}
+
 .dashboard-header {
   display: flex;
   flex-wrap: wrap;
@@ -80,9 +84,34 @@ body {
   flex-shrink: 0;
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 .range-selector {
   display: flex;
   gap: 0.4rem;
+}
+
+.width-toggle-button {
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.width-toggle-button[aria-pressed="true"] {
+  background: var(--pi-green);
+  border-color: var(--pi-green);
+  color: #fff;
 }
 
 .range-link {
