@@ -129,4 +129,4 @@ without rework:
 
 ## License
 
-No license has been chosen yet for this repository.
+[MIT](LICENSE)
