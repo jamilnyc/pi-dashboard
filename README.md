@@ -114,9 +114,10 @@ RAILS_ENV=production bin/rails assets:precompile
 RAILS_ENV=production bin/rails db:prepare
 ```
 
-A `Dockerfile` is also present (from the default Rails 8 generator) but has
-not been adapted or tested against this app's multi-database / embedded
-Solid Queue setup — the systemd route above is the tested path.
+There's no Docker/Kamal path: this app reads the *host's* `/proc`, `/sys`,
+`df`, and `ps` to report on the machine it's running on, which containers
+deliberately isolate you from. Bare metal (or a systemd service, as above)
+is the right fit here, not a container.
 
 ## Roadmap
 
