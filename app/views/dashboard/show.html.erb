@@ -1,4 +1,11 @@
 <% content_for :title, "Pi Stats Dashboard" %>
+<%# Stats poll every 60s in the background, but this page is a plain server
+    render with no live client-side updates -- without this, a tab left open
+    keeps showing whatever was true at the moment it was loaded, no matter how
+    much new data has since accumulated. Auto-reload keeps it current. %>
+<% content_for :head do %>
+  <meta http-equiv="refresh" content="60">
+<% end %>
 <% pi_red = "#c51a4a"; pi_green = "#75b928"; pi_charcoal = "#2b2b2b" %>
 <%
   # With xtype: "string", each chart's x-axis is a plain category scale with
