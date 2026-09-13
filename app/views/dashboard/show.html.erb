@@ -2,15 +2,18 @@
 <%# Stats poll every 60s in the background, but this page is a plain server
     render with no live client-side updates -- without this, a tab left open
     keeps showing whatever was true at the moment it was loaded, no matter how
-    much new data has since accumulated. Auto-reload keeps it current. %>
+    much new data has since accumulated. The refresh Stimulus controller
+    (not a <meta http-equiv="refresh"> tag -- see its comment for why)
+    reloads it on a timer so it stays current, and this same element's CSS
+    animation draws a countdown bar to the next reload. %>
 <% refresh_interval = 60 %>
-<% content_for :head do %>
-  <meta http-equiv="refresh" content="<%= refresh_interval %>">
-<% end %>
-<%# Pure-CSS countdown bar timed to match the meta refresh above -- it starts
-    draining the instant this fresh page loads, so no JS/setInterval needed to
-    keep it in sync; a reload just restarts both together. %>
-<div class="refresh-progress" style="animation-duration: <%= refresh_interval %>s;" aria-hidden="true"></div>
+<div
+  class="refresh-progress"
+  style="animation-duration: <%= refresh_interval %>s;"
+  data-controller="refresh"
+  data-refresh-interval-value="<%= refresh_interval %>"
+  aria-hidden="true"
+></div>
 <% pi_red = "#c51a4a"; pi_green = "#75b928"; pi_charcoal = "#2b2b2b" %>
 <%
   # With xtype: "string", each chart's x-axis is a plain category scale with
