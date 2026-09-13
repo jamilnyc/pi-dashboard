@@ -14,7 +14,12 @@
   data-refresh-interval-value="<%= refresh_interval %>"
   aria-hidden="true"
 ></div>
-<% pi_red = "#c51a4a"; pi_green = "#75b928"; pi_charcoal = "#2b2b2b" %>
+<%# pi_charcoal (#2b2b2b) was picked to match the light-theme text color, but
+    that makes it nearly invisible as a chart line against the dark-theme
+    background (#1a1a1a) -- which is exactly why the disk usage charts
+    looked empty in dark mode: the line was there, just the same color as
+    its background. pi_blue has real contrast against both themes. %>
+<% pi_red = "#c51a4a"; pi_green = "#75b928"; pi_blue = "#3b7dd8" %>
 <%
   # discrete: true is Chartkick's real option for "treat the x-axis as a
   # plain category scale" -- xtype: "string" (used here previously) isn't a
@@ -115,7 +120,7 @@
       <% @query.disk_series_by_mount_point.each do |mount_point, series| %>
         <div class="chart-card">
           <h2>Disk usage &mdash; <%= mount_point %></h2>
-          <%= line_chart(series, **time_axis, suffix: "%", min: 0, max: 100, colors: [pi_charcoal]) %>
+          <%= line_chart(series, **time_axis, suffix: "%", min: 0, max: 100, colors: [pi_blue]) %>
         </div>
       <% end %>
 
