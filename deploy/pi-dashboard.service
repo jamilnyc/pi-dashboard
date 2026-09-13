@@ -7,7 +7,7 @@ Wants=network-online.target
 Type=simple
 User=admin
 Group=admin
-WorkingDirectory=/home/admin/code
+WorkingDirectory=/home/admin/pi-dashboard
 Environment=RAILS_ENV=production
 Environment=PORT=3000
 Environment=SOLID_QUEUE_IN_PUMA=true
