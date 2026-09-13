@@ -1,0 +1,33 @@
+# Template for the systemd unit that runs the dashboard in production.
+#
+# You have two options:
+#   1. Run `bin/setup_server` from the repo root -- it fills in the
+#      {{PLACEHOLDERS}} below (asking you for each value, defaulting to what
+#      it detects) and installs the result automatically. This is the
+#      single-command path described in the README.
+#   2. Fill in the {{PLACEHOLDERS}} by hand and install it yourself:
+#        sudo cp deploy/pi-dashboard.service.example /etc/systemd/system/pi-dashboard.service
+#        sudo systemctl daemon-reload
+#        sudo systemctl enable --now pi-dashboard
+
+[Unit]
+Description=Pi Stats Dashboard (Puma)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User={{USER}}
+Group={{GROUP}}
+WorkingDirectory={{WORKING_DIRECTORY}}
+Environment=RAILS_ENV=production
+Environment=PORT={{PORT}}
+Environment=SOLID_QUEUE_IN_PUMA=true
+Environment=RAILS_LOG_TO_STDOUT=true
+ExecStart={{BUNDLE_PATH}} exec puma -C config/puma.rb
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

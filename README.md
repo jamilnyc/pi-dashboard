@@ -96,22 +96,35 @@ the first-poll-ever and counter-reset edge cases).
 ## Deployment
 
 This app is designed to run as a single Puma process (Solid Queue's
-supervisor embedded via `SOLID_QUEUE_IN_PUMA=true`) under systemd. An
-example unit file is in `deploy/pi-dashboard.service` — copy it, adjust the
-`User`/`Group`/`WorkingDirectory`/`ExecStart` paths for your setup, then:
+supervisor embedded via `SOLID_QUEUE_IN_PUMA=true`) under systemd — not in a
+container; see below.
+
+The single-command path, from a fresh clone:
 
 ```sh
-sudo cp deploy/pi-dashboard.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now pi-dashboard
+bundle install
+bin/setup_server
 ```
 
-Before first boot in production, precompile assets and create the
-databases:
+`bin/setup_server` asks for the system user/group to run as and the path
+the repo lives at (defaulting to whatever it detects), then handles
+everything else: generating fresh credentials if `config/master.key` isn't
+present (it's gitignored — the `credentials.yml.enc` committed to this repo
+was encrypted with the original author's key, which nobody else has),
+preparing the production database, precompiling assets, and installing +
+starting the systemd service from `deploy/pi-dashboard.service.example`.
+It's safe to re-run any time (e.g. after a Ruby upgrade, or to pick up a
+`git pull`).
+
+To do it by hand instead, fill in the `{{PLACEHOLDERS}}` in
+`deploy/pi-dashboard.service.example` and:
 
 ```sh
-RAILS_ENV=production bin/rails assets:precompile
 RAILS_ENV=production bin/rails db:prepare
+RAILS_ENV=production bin/rails assets:precompile
+sudo cp deploy/pi-dashboard.service.example /etc/systemd/system/pi-dashboard.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now pi-dashboard
 ```
 
 There's no Docker/Kamal path: this app reads the *host's* `/proc`, `/sys`,

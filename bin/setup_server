@@ -1,0 +1,158 @@
+#!/usr/bin/env ruby
+# Interactive production setup: get the dashboard running as a systemd
+# service with a single command after cloning the repo.
+#
+# This is distinct from bin/setup, which is Rails' own DEVELOPMENT
+# bootstrap (bundle install + db:prepare + starts a dev server). This
+# script targets a real deployment: it also generates fresh credentials if
+# needed, precompiles assets, and installs + starts a systemd unit.
+#
+# Safe to re-run: every step here is idempotent (bundle install, db:prepare,
+# and re-installing the same unit file are all no-ops or simple overwrites
+# if nothing changed).
+
+require "fileutils"
+require "etc"
+require "tmpdir"
+
+APP_ROOT = File.expand_path("..", __dir__)
+
+def system!(*args)
+  system(*args, exception: true)
+end
+
+def capture!(*args)
+  out = IO.popen(args, &:read)
+  raise "Command failed: #{args.join(' ')}" unless $?.success?
+  out.strip
+end
+
+def prompt(question, default)
+  print "#{question} [#{default}]: "
+  answer = $stdin.gets.to_s.strip
+  answer.empty? ? default : answer
+end
+
+FileUtils.chdir APP_ROOT do
+  puts "== Pi Stats Dashboard: production setup =="
+  puts "Repo root: #{APP_ROOT}"
+
+  configured_ruby = File.read(".ruby-version").strip rescue nil
+  if configured_ruby && RUBY_VERSION != configured_ruby
+    puts "\n(!) This repo expects Ruby #{configured_ruby}, but `ruby` on your" \
+         " PATH is #{RUBY_VERSION}. Continuing anyway -- if something below" \
+         " fails, that's the first thing to check.\n"
+  end
+
+  puts "\n== Who should run the service? =="
+  default_user = Etc.getlogin || ENV["USER"] || ENV["LOGNAME"]
+  default_group = begin
+    Etc.getgrgid(Etc.getpwnam(default_user).gid).name
+  rescue StandardError
+    default_user
+  end
+  service_user = prompt("System user to run the service as", default_user)
+  service_group = prompt("System group", default_group)
+  working_directory = prompt("Absolute path this repo lives at", APP_ROOT)
+  port = prompt("Port to listen on (avoid 80 if something like Pi-hole is already using it)", "3000")
+
+  # Prefer rbenv's shim over anything found by resolving a path in-process
+  # (RbConfig::CONFIG["bindir"], or scanning ENV["PATH"]). Both of those
+  # come back with the *real* bundle binary buried inside a specific
+  # version's bin/ directory, with no version/gemset selection around it --
+  # invoking that directly under systemd's minimal environment fails with
+  # "bundler: command not found: puma" (bundler runs, but against the wrong
+  # gem set). That's exactly what rbenv's shim script exists to set up
+  # (GEM_HOME/GEM_PATH, derived from .ruby-version) before re-executing the
+  # real binary -- and it does that self-contained lookup itself, regardless
+  # of the caller's own PATH/environment, which is why hardcoding its
+  # absolute path is safe under systemd. (In-process PATH inspection can't
+  # find the shim here for an ironic reason: rbenv's *ruby* shim itself
+  # rewrites this very process's PATH to prioritize the version's bin/
+  # directory before this script's first line ever runs.)
+  rbenv_root = ENV["RBENV_ROOT"] || File.expand_path("~/.rbenv")
+  rbenv_shim = File.join(rbenv_root, "shims", "bundle")
+
+  bundle_path =
+    if File.executable?(rbenv_shim)
+      rbenv_shim
+    else
+      ENV["PATH"].to_s.split(File::PATH_SEPARATOR)
+        .map { |dir| File.join(dir, "bundle") }
+        .find { |path| File.executable?(path) }
+    end
+
+  if bundle_path.nil?
+    abort "Could not find a `bundle` executable. Install bundler first (see README), then re-run this script."
+  end
+  puts "Using bundle at: #{bundle_path}"
+
+  puts "\n== Installing dependencies =="
+  system("bundle check") || system!("bundle install")
+
+  master_key = File.join("config", "master.key")
+  credentials = File.join("config", "credentials.yml.enc")
+  if !File.exist?(master_key)
+    puts "\n== Generating fresh credentials =="
+    puts "config/master.key isn't present (it's gitignored on purpose -- the" \
+         " credentials.yml.enc committed to this repo was encrypted with the" \
+         " original author's key, which nobody else has). Generating a new" \
+         " master key + credentials file instead."
+    File.delete(credentials) if File.exist?(credentials)
+    system!({ "EDITOR" => "true" }, "bin/rails", "credentials:edit")
+  end
+
+  puts "\n== Preparing the production database =="
+  system!({ "RAILS_ENV" => "production" }, "bin/rails", "db:prepare")
+
+  puts "\n== Precompiling assets =="
+  system!({ "RAILS_ENV" => "production" }, "bin/rails", "assets:precompile")
+
+  puts "\n== Installing the systemd service =="
+  template = File.read("deploy/pi-dashboard.service.example")
+  rendered = template
+    .sub("{{USER}}", service_user)
+    .sub("{{GROUP}}", service_group)
+    .sub("{{WORKING_DIRECTORY}}", working_directory)
+    .sub("{{PORT}}", port)
+    .sub("{{BUNDLE_PATH}}", bundle_path)
+
+  Dir.mktmpdir do |dir|
+    unit_path = File.join(dir, "pi-dashboard.service")
+    File.write(unit_path, rendered)
+    puts "This next part needs sudo, to install and start the systemd service."
+    system!("sudo", "cp", unit_path, "/etc/systemd/system/pi-dashboard.service")
+  end
+  system!("sudo", "systemctl", "daemon-reload")
+  system!("sudo", "systemctl", "enable", "pi-dashboard")
+  # `enable --now` only starts the service if it wasn't already running, so
+  # re-running this script against an already-active service (e.g. to pick
+  # up a new bundle path after a Ruby upgrade) would silently keep the old
+  # process going. `restart` always applies whatever's current.
+  system!("sudo", "systemctl", "restart", "pi-dashboard")
+
+  puts "\n== Verifying =="
+  # systemd considers a `Type=simple` unit "active" the moment the process
+  # forks, well before Puma has actually finished booting the app (loading
+  # Rails, running Solid Queue's fork supervisor, binding the port) --
+  # especially on a Pi's more modest CPU. Poll the real HTTP endpoint
+  # instead of trusting `is-active` alone.
+  require "net/http"
+  responded = false
+  15.times do
+    begin
+      responded = Net::HTTP.get_response(URI("http://localhost:#{port}/")).is_a?(Net::HTTPSuccess)
+    rescue StandardError
+      responded = false
+    end
+    break if responded
+    sleep 1
+  end
+
+  if responded
+    puts "Up and running: http://localhost:#{port}/ (or http://<this-host>:#{port}/ from another device on your LAN)"
+  else
+    status = capture!("systemctl", "is-active", "pi-dashboard") rescue "unknown"
+    puts "Not responding after 15s (systemd reports: #{status}) -- check `sudo journalctl -u pi-dashboard -f` for details."
+  end
+end
