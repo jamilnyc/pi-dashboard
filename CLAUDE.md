@@ -21,8 +21,11 @@ bundle exec rspec spec/services/stats/cpu_reader_spec.rb   # single file
 bundle exec rspec spec/services/stats/cpu_reader_spec.rb:42 # single example by line
 bin/rubocop                  # lint (rubocop-rails-omakase house style)
 bin/brakeman                 # static security scan
-bin/ci                       # runs the full CI pipeline (see config/ci.rb) locally
+bin/bundler-audit            # gem vulnerability audit (config/bundler-audit.yml)
+bin/importmap audit          # importmap/JS vulnerability audit
+bin/ci                       # runs rubocop + the 3 security scans (config/ci.rb) — does NOT run rspec, run that separately
 bin/setup_server             # interactive one-command production deploy (see README)
+bin/uninstall_server         # reverses bin/setup_server (stop/disable/remove the systemd unit, offer to clean up DB/credentials)
 ```
 
 Production deploy is systemd-based, not containerized — there is deliberately

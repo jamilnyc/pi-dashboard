@@ -134,6 +134,18 @@ There's no Docker/Kamal path: this app reads the *host's* `/proc`, `/sys`,
 deliberately isolate you from. Bare metal (or a systemd service, as above)
 is the right fit here, not a container.
 
+To remove the systemd service again:
+
+```sh
+bin/uninstall_server
+```
+
+It stops, disables, and removes the unit installed by `bin/setup_server`,
+then interactively offers to also delete the production database (all
+collected stat history) and the generated `config/master.key` — both are
+kept by default unless you confirm. The repo itself and its gems are left
+alone.
+
 ## Roadmap
 
 Not implemented yet, but the architecture is meant to accommodate these
