@@ -96,13 +96,13 @@ module Stats
     end
 
     def compute_network_rates(previous_iface, iface, interval)
-      return [nil, nil] if previous_iface.nil? || interval.nil? || interval <= 0
+      return [ nil, nil ] if previous_iface.nil? || interval.nil? || interval <= 0
 
       rx_delta = iface.rx_bytes - previous_iface.rx_bytes_total
       tx_delta = iface.tx_bytes - previous_iface.tx_bytes_total
-      return [nil, nil] if rx_delta.negative? || tx_delta.negative? # counter reset / interface replugged
+      return [ nil, nil ] if rx_delta.negative? || tx_delta.negative? # counter reset / interface replugged
 
-      [(rx_delta / interval).round(1), (tx_delta / interval).round(1)]
+      [ (rx_delta / interval).round(1), (tx_delta / interval).round(1) ]
     end
   end
 end

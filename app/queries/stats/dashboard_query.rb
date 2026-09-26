@@ -40,15 +40,15 @@ module Stats
     # objects parse to plain JS objects, so singleSeriesFormat comes back
     # false and each series' real [x, y] pairs are used as-is.
     def cpu_series
-      [{ name: "CPU %", data: pairs_for(:cpu_percent) }]
+      [ { name: "CPU %", data: pairs_for(:cpu_percent) } ]
     end
 
     def memory_series
-      [{ name: "Memory %", data: pairs_for(:mem_percent) }]
+      [ { name: "Memory %", data: pairs_for(:mem_percent) } ]
     end
 
     def temperature_series
-      [{ name: "Temperature (°C)", data: pairs_for(:cpu_temp_celsius) }]
+      [ { name: "Temperature (°C)", data: pairs_for(:cpu_temp_celsius) } ]
     end
 
     # => { "/" => [{ name: "Used %", data: [[time_label, pct], ...] }], ... }
@@ -60,7 +60,7 @@ module Stats
         .pluck(:mount_point, "stat_snapshots.recorded_at", :use_percent)
         .group_by { |mount_point, _, _| mount_point }
         .transform_values do |rows|
-          [{ name: "Used %", data: rows.map { |_, time, pct| [label(time), pct] } }]
+          [ { name: "Used %", data: rows.map { |_, time, pct| [ label(time), pct ] } } ]
         end
     end
 
@@ -76,8 +76,8 @@ module Stats
         .group_by { |iface, _, _, _| iface }
         .transform_values do |rows|
           [
-            { name: "Download (↓)", data: rows.map { |_, time, rx, _| [label(time), kb_per_sec(rx)] } },
-            { name: "Upload (↑)", data: rows.map { |_, time, _, tx| [label(time), kb_per_sec(tx)] } }
+            { name: "Download (↓)", data: rows.map { |_, time, rx, _| [ label(time), kb_per_sec(rx) ] } },
+            { name: "Upload (↑)", data: rows.map { |_, time, _, tx| [ label(time), kb_per_sec(tx) ] } }
           ]
         end
     end
@@ -85,7 +85,7 @@ module Stats
     private
 
     def pairs_for(column)
-      snapshots_scope.pluck(:recorded_at, column).map { |t, v| [label(t), v] }
+      snapshots_scope.pluck(:recorded_at, column).map { |t, v| [ label(t), v ] }
     end
 
     def kb_per_sec(bytes_per_sec)

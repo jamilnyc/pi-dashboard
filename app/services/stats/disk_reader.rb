@@ -31,8 +31,8 @@ module Stats
     private
 
     def df_command
-      cmd = ["df", "--output=source,fstype,size,used,avail,target", "-B1"]
-      EXCLUDED_FS_TYPES.each { |type| cmd += ["-x", type] }
+      cmd = [ "df", "--output=source,fstype,size,used,avail,target", "-B1" ]
+      EXCLUDED_FS_TYPES.each { |type| cmd += [ "-x", type ] }
       cmd
     end
   end

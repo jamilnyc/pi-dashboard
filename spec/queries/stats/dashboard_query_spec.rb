@@ -30,7 +30,7 @@ RSpec.describe Stats::DashboardQuery do
       expect(series.length).to eq(1)
       expect(series.first[:name]).to eq("CPU %")
       expect(series.first[:data].length).to eq(2)
-      expect(series.first[:data].map(&:last)).to eq([1.5, 2.5])
+      expect(series.first[:data].map(&:last)).to eq([ 1.5, 2.5 ])
     end
   end
 
@@ -40,8 +40,8 @@ RSpec.describe Stats::DashboardQuery do
 
       series = described_class.new(since: 1.hour.ago).memory_series
 
-      expect(series).to eq([{ name: "Memory %", data: series.first[:data] }])
-      expect(series.first[:data].map(&:last)).to eq([42.0])
+      expect(series).to eq([ { name: "Memory %", data: series.first[:data] } ])
+      expect(series.first[:data].map(&:last)).to eq([ 42.0 ])
     end
   end
 

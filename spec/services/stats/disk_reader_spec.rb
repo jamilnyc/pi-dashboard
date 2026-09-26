@@ -7,7 +7,7 @@ RSpec.describe Stats::DiskReader do
       /dev/mmcblk0p2   ext4        125242245120 9780723712 109078794240 /
       /dev/mmcblk0p1   vfat           534763520   82335744    452427776 /boot/firmware
     DF
-    allow(Open3).to receive(:capture2).and_return([df_output, instance_double(Process::Status, success?: true)])
+    allow(Open3).to receive(:capture2).and_return([ df_output, instance_double(Process::Status, success?: true) ])
 
     disks = described_class.new.call
 
@@ -27,7 +27,7 @@ RSpec.describe Stats::DiskReader do
   end
 
   it "returns an empty array when df fails" do
-    allow(Open3).to receive(:capture2).and_return(["", instance_double(Process::Status, success?: false)])
+    allow(Open3).to receive(:capture2).and_return([ "", instance_double(Process::Status, success?: false) ])
 
     expect(described_class.new.call).to eq([])
   end

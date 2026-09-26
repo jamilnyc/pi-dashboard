@@ -10,6 +10,6 @@ class CreateNetworkUsages < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    add_index :network_usages, [:stat_snapshot_id, :interface]
+    add_index :network_usages, [ :stat_snapshot_id, :interface ]
   end
 end

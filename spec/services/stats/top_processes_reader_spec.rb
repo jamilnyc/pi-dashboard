@@ -11,7 +11,7 @@ RSpec.describe Stats::TopProcessesReader do
     PS
     allow(Open3).to receive(:capture2)
       .with("ps", "-eo", "pid,comm,rss,pcpu,pmem", "--sort=-rss", "--no-headers")
-      .and_return([ps_output, instance_double(Process::Status, success?: true)])
+      .and_return([ ps_output, instance_double(Process::Status, success?: true) ])
 
     result = described_class.new.call
 
@@ -23,7 +23,7 @@ RSpec.describe Stats::TopProcessesReader do
     ps_output = "173318 claude 485424 6.9 5.8\n237691 chromium 293664 4.8 3.5\n"
     allow(Open3).to receive(:capture2)
       .with("ps", "-eo", "pid,comm,rss,pcpu,pmem", "--sort=-pcpu", "--no-headers")
-      .and_return([ps_output, instance_double(Process::Status, success?: true)])
+      .and_return([ ps_output, instance_double(Process::Status, success?: true) ])
 
     result = described_class.new.call(sort_by: :cpu)
 
@@ -34,7 +34,7 @@ RSpec.describe Stats::TopProcessesReader do
     ps_output = "1 a 100 1.0 1.0\n2 b 90 0.9 0.9\n3 c 80 0.8 0.8\n"
     allow(Open3).to receive(:capture2)
       .with("ps", "-eo", "pid,comm,rss,pcpu,pmem", "--sort=-rss", "--no-headers")
-      .and_return([ps_output, instance_double(Process::Status, success?: true)])
+      .and_return([ ps_output, instance_double(Process::Status, success?: true) ])
 
     expect(described_class.new.call(limit: 2).length).to eq(2)
   end
@@ -42,7 +42,7 @@ RSpec.describe Stats::TopProcessesReader do
   it "returns an empty array when ps fails" do
     allow(Open3).to receive(:capture2)
       .with("ps", "-eo", "pid,comm,rss,pcpu,pmem", "--sort=-rss", "--no-headers")
-      .and_return(["", instance_double(Process::Status, success?: false)])
+      .and_return([ "", instance_double(Process::Status, success?: false) ])
 
     expect(described_class.new.call).to eq([])
   end

@@ -12,6 +12,6 @@ class CreateDiskUsages < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    add_index :disk_usages, [:stat_snapshot_id, :mount_point]
+    add_index :disk_usages, [ :stat_snapshot_id, :mount_point ]
   end
 end
