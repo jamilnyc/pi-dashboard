@@ -28,6 +28,11 @@ Rails.application.configure do
   # Change to :null_store to avoid any caching.
   config.cache_store = :memory_store
 
+  # Solid Queue's own tables live in a separate database connection, same as
+  # production (see config/database.yml) -- without this, SOLID_QUEUE_IN_PUMA=true
+  # or `bin/jobs` can't find solid_queue_recurring_tasks and crash on boot.
+  config.solid_queue.connects_to = { database: { writing: :queue } }
+
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
