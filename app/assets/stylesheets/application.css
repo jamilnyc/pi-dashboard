@@ -233,6 +233,51 @@ body {
   filter: grayscale(1);
 }
 
+.connectivity-section {
+  margin-bottom: 2rem;
+}
+
+.connectivity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.connectivity-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+}
+
+.connectivity-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.connectivity-dot.is-up {
+  background: var(--pi-green);
+}
+
+.connectivity-dot.is-down {
+  background: var(--pi-red);
+}
+
+.connectivity-host {
+  flex: 1;
+  color: var(--text);
+}
+
+.connectivity-latency {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .charts {
   display: flex;
   flex-direction: column;

@@ -69,6 +69,27 @@
     </div>
   </header>
 
+  <section class="connectivity-section" aria-label="Internet connectivity">
+    <div class="chart-card">
+      <h2>Connectivity</h2>
+      <% if @connectivity_status.empty? %>
+        <p class="empty-state">Not checked yet &mdash; runs automatically every couple of minutes.</p>
+      <% else %>
+        <ul class="connectivity-list">
+          <% @connectivity_status.each do |result| %>
+            <li class="connectivity-row">
+              <span class="connectivity-dot <%= result.reachable ? "is-up" : "is-down" %>" aria-hidden="true"></span>
+              <span class="connectivity-host"><%= result.host %></span>
+              <span class="connectivity-latency">
+                <%= result.reachable ? "#{result.latency_ms} ms" : "unreachable" %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+  </section>
+
   <% if (snapshot = @query.latest_snapshot).nil? %>
     <p class="empty-state">
       No stats have been collected yet. The background job polls every 60 seconds &mdash;

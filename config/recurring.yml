@@ -21,9 +21,17 @@ production:
     class: StatsPruneJob
     queue: default
     schedule: every day at 3:30am
+  connectivity_check:
+    class: ConnectivityCheckJob
+    queue: default
+    schedule: every 2 minutes
 
 development:
   stats_poll:
     class: StatsPollJob
     queue: default
     schedule: every 60 seconds
+  connectivity_check:
+    class: ConnectivityCheckJob
+    queue: default
+    schedule: every 2 minutes
