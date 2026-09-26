@@ -8,5 +8,6 @@ class DashboardController < ApplicationController
     @system_info = Stats::SystemInfoReader.new.call
     @top_cpu_processes = Stats::TopProcessesReader.new.call(sort_by: :cpu)
     @top_memory_processes = Stats::TopProcessesReader.new.call(sort_by: :memory)
+    @wifi_status = Stats::WifiStatusReader.new.call
   end
 end

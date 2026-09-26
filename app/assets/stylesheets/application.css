@@ -228,6 +228,11 @@ body {
   margin-top: -0.6rem;
 }
 
+.is-wifi-disconnected {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
 .charts {
   display: flex;
   flex-direction: column;

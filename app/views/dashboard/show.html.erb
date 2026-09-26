@@ -115,17 +115,25 @@
         </div>
       <% end %>
       <% @query.latest_network_usages.each do |iface| %>
-        <div class="tile">
-          <span class="tile-label"><%= iface.interface %></span>
-          <span class="tile-value">
-            <span class="net-rate">&darr; <%= iface.rx_bytes_per_sec ? number_to_human_size(iface.rx_bytes_per_sec) + "/s" : "&ndash;".html_safe %></span>
-            <span class="net-rate">&uarr; <%= iface.tx_bytes_per_sec ? number_to_human_size(iface.tx_bytes_per_sec) + "/s" : "&ndash;".html_safe %></span>
-          </span>
-          <span class="tile-sub">
-            &darr; <%= number_to_human_size(iface.rx_bytes_total) %> total &middot;
-            &uarr; <%= number_to_human_size(iface.tx_bytes_total) %> total
-          </span>
-        </div>
+        <% if wifi_disconnected?(iface.interface, @wifi_status) %>
+          <div class="tile is-wifi-disconnected">
+            <span class="tile-label"><%= iface.interface %></span>
+            <span class="tile-value">Wi-Fi off</span>
+            <span class="tile-sub">Not connected</span>
+          </div>
+        <% else %>
+          <div class="tile">
+            <span class="tile-label"><%= iface.interface %></span>
+            <span class="tile-value">
+              <span class="net-rate">&darr; <%= iface.rx_bytes_per_sec ? number_to_human_size(iface.rx_bytes_per_sec) + "/s" : "&ndash;".html_safe %></span>
+              <span class="net-rate">&uarr; <%= iface.tx_bytes_per_sec ? number_to_human_size(iface.tx_bytes_per_sec) + "/s" : "&ndash;".html_safe %></span>
+            </span>
+            <span class="tile-sub">
+              &darr; <%= number_to_human_size(iface.rx_bytes_total) %> total &middot;
+              &uarr; <%= number_to_human_size(iface.tx_bytes_total) %> total
+            </span>
+          </div>
+        <% end %>
       <% end %>
     </section>
 
@@ -187,10 +195,17 @@
         <summary>Networking</summary>
         <div class="chart-group-body">
           <% @query.network_series_by_interface.each do |interface, series| %>
-            <div class="chart-card">
-              <h2>Network &mdash; <%= interface %></h2>
-              <%= line_chart(series, **time_axis, suffix: "KBps", colors: [pi_green, pi_red]) %>
-            </div>
+            <% if wifi_disconnected?(interface, @wifi_status) %>
+              <div class="chart-card is-wifi-disconnected">
+                <h2>Network &mdash; <%= interface %></h2>
+                <p class="empty-state">Wi-Fi is disconnected &mdash; no data to chart.</p>
+              </div>
+            <% else %>
+              <div class="chart-card">
+                <h2>Network &mdash; <%= interface %></h2>
+                <%= line_chart(series, **time_axis, suffix: "KBps", colors: [pi_green, pi_red]) %>
+              </div>
+            <% end %>
           <% end %>
         </div>
       </details>

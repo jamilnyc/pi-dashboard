@@ -25,6 +25,13 @@ module ApplicationHelper
     (fraction * 180) - 90
   end
 
+  # wifi_status is the Hash from Stats::WifiStatusReader (interface name =>
+  # connected boolean). An interface absent from it isn't Wi-Fi at all
+  # (e.g. eth0), so it's never considered "disconnected" by this check.
+  def wifi_disconnected?(interface, wifi_status)
+    wifi_status.key?(interface) && !wifi_status.fetch(interface)
+  end
+
   private
 
   # fraction 0 -> leftmost point of the arc, 0.5 -> topmost, 1 -> rightmost --
