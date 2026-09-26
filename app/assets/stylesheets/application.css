@@ -26,14 +26,27 @@
   --accent: var(--pi-red);
 }
 
+/* Follows the OS/browser preference by default. The theme toggle
+   (app/javascript/controllers/theme_controller.js) can override that by
+   setting data-theme on <html>, which always wins over the media query --
+   :not([data-theme="light"]) is what lets an explicit "light" override
+   suppress these dark values even when the OS prefers dark. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #1a1a1a;
     --surface: #242424;
     --text: #f0f0f0;
     --text-muted: #a0a0a0;
     --border: #3a3a3a;
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #1a1a1a;
+  --surface: #242424;
+  --text: #f0f0f0;
+  --text-muted: #a0a0a0;
+  --border: #3a3a3a;
 }
 
 * {
@@ -97,7 +110,8 @@ body {
   gap: 0.4rem;
 }
 
-.width-toggle-button {
+.width-toggle-button,
+.theme-toggle-button {
   padding: 0.35rem 0.8rem;
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -109,7 +123,8 @@ body {
   cursor: pointer;
 }
 
-.width-toggle-button[aria-pressed="true"] {
+.width-toggle-button[aria-pressed="true"],
+.theme-toggle-button[aria-pressed="true"] {
   background: var(--pi-green);
   border-color: var(--pi-green);
   color: #fff;

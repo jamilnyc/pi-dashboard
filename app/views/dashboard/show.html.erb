@@ -45,7 +45,7 @@
   }
 %>
 
-<div class="dashboard" data-controller="width-toggle">
+<div class="dashboard" data-controller="width-toggle theme">
   <header class="dashboard-header">
     <h1>
       <span class="pi-logo" aria-hidden="true"></span>
@@ -58,6 +58,14 @@
           <%= link_to key, root_path(range: key), class: "range-link #{"is-active" if key == @range_key}" %>
         <% end %>
       </nav>
+
+      <button
+        type="button"
+        class="theme-toggle-button"
+        data-theme-target="button"
+        data-action="click->theme#toggle"
+        aria-pressed="false"
+      >Dark mode</button>
 
       <button
         type="button"
