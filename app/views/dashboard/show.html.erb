@@ -78,22 +78,40 @@
     <section class="tiles" aria-label="Current stats">
       <div class="tile">
         <span class="tile-label">CPU</span>
-        <span class="tile-value"><%= snapshot.cpu_percent ? number_to_percentage(snapshot.cpu_percent, precision: 1) : "&ndash;".html_safe %></span>
+        <%= render "gauge",
+              value: snapshot.cpu_percent, min: 0, max: 100, yellow_at: 70, red_at: 90,
+              label: "CPU usage",
+              value_text: snapshot.cpu_percent ? number_to_percentage(snapshot.cpu_percent, precision: 1) : "&ndash;".html_safe,
+              sub_text: nil %>
       </div>
       <div class="tile">
         <span class="tile-label">Memory</span>
-        <span class="tile-value"><%= number_to_percentage(snapshot.mem_percent, precision: 1) %></span>
-        <span class="tile-sub"><%= number_to_human_size(snapshot.mem_used_kb * 1024) %> / <%= number_to_human_size(snapshot.mem_total_kb * 1024) %></span>
+        <%= render "gauge",
+              value: snapshot.mem_percent, min: 0, max: 100, yellow_at: 70, red_at: 90,
+              label: "Memory usage",
+              value_text: number_to_percentage(snapshot.mem_percent, precision: 1),
+              sub_text: "#{number_to_human_size(snapshot.mem_used_kb * 1024)} / #{number_to_human_size(snapshot.mem_total_kb * 1024)}" %>
       </div>
       <div class="tile">
         <span class="tile-label">Temperature</span>
-        <span class="tile-value"><%= snapshot.cpu_temp_celsius ? "#{number_with_precision(snapshot.cpu_temp_celsius, precision: 1)}°C" : "&ndash;".html_safe %></span>
+        <%# Raspberry Pi OS starts throttling around 80C and hits its hard
+            thermal limit near 85C, so those are the natural warn/crit
+            thresholds here -- unlike the other gauges, this isn't a
+            percentage, so the 0..100 range is just "degrees C", not "%". %>
+        <%= render "gauge",
+              value: snapshot.cpu_temp_celsius, min: 0, max: 100, yellow_at: 60, red_at: 80,
+              label: "CPU temperature",
+              value_text: snapshot.cpu_temp_celsius ? "#{number_with_precision(snapshot.cpu_temp_celsius, precision: 1)}°C" : "&ndash;".html_safe,
+              sub_text: nil %>
       </div>
       <% @query.latest_disk_usages.each do |disk| %>
         <div class="tile">
           <span class="tile-label"><%= disk.mount_point %></span>
-          <span class="tile-value"><%= number_to_percentage(disk.use_percent, precision: 1) %></span>
-          <span class="tile-sub"><%= number_to_human_size(disk.used_bytes) %> / <%= number_to_human_size(disk.total_bytes) %></span>
+          <%= render "gauge",
+                value: disk.use_percent, min: 0, max: 100, yellow_at: 80, red_at: 95,
+                label: "Disk usage for #{disk.mount_point}",
+                value_text: number_to_percentage(disk.use_percent, precision: 1),
+                sub_text: "#{number_to_human_size(disk.used_bytes)} / #{number_to_human_size(disk.total_bytes)}" %>
         </div>
       <% end %>
       <% @query.latest_network_usages.each do |iface| %>

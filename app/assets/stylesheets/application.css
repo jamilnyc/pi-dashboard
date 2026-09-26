@@ -12,6 +12,7 @@
 :root {
   --pi-red: #c51a4a;
   --pi-green: #75b928;
+  --pi-amber: #e0a526;
   --pi-charcoal: #2b2b2b;
   --pi-light-gray: #f4f4f4;
   --pi-mid-gray: #6e6e6e;
@@ -177,6 +178,54 @@ body {
 .tile-sub {
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+
+.gauge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.gauge {
+  width: 100%;
+  max-width: 140px;
+  height: auto;
+}
+
+.gauge-zone {
+  fill: none;
+  stroke-width: 14;
+}
+
+.gauge-zone-ok {
+  stroke: var(--pi-green);
+}
+
+.gauge-zone-warn {
+  stroke: var(--pi-amber);
+}
+
+.gauge-zone-crit {
+  stroke: var(--pi-red);
+}
+
+.gauge-needle {
+  stroke: var(--text);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: transform 0.3s ease;
+}
+
+.gauge-pivot {
+  fill: var(--text);
+}
+
+.gauge-readout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -0.6rem;
 }
 
 .charts {

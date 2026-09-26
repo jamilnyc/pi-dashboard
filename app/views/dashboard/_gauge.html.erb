@@ -1,0 +1,31 @@
+<%# locals: value (Numeric or nil), min, max (Numeric -- the gauge's full range),
+    yellow_at, red_at (Numeric -- thresholds, same units as value, where the
+    zone color switches), label (String, for the SVG's accessible name),
+    value_text (String, the big readout), sub_text (String, optional second line) %>
+<%
+  fraction = gauge_fraction(value, min, max)
+  yellow_fraction = gauge_fraction(yellow_at, min, max)
+  red_fraction = gauge_fraction(red_at, min, max)
+%>
+<div class="gauge-wrap">
+  <svg class="gauge" viewBox="0 0 120 68" role="img" aria-label="<%= label %>: <%= value_text %>">
+    <path d="<%= gauge_arc_path(0.0, yellow_fraction) %>" class="gauge-zone gauge-zone-ok" />
+    <path d="<%= gauge_arc_path(yellow_fraction, red_fraction) %>" class="gauge-zone gauge-zone-warn" />
+    <path d="<%= gauge_arc_path(red_fraction, 1.0) %>" class="gauge-zone gauge-zone-crit" />
+    <% if fraction %>
+      <line
+        x1="<%= ApplicationHelper::GAUGE_CENTER %>" y1="<%= ApplicationHelper::GAUGE_CENTER %>"
+        x2="<%= ApplicationHelper::GAUGE_CENTER %>" y2="22"
+        class="gauge-needle"
+        transform="rotate(<%= gauge_needle_rotation(fraction) %> <%= ApplicationHelper::GAUGE_CENTER %> <%= ApplicationHelper::GAUGE_CENTER %>)"
+      />
+      <circle cx="<%= ApplicationHelper::GAUGE_CENTER %>" cy="<%= ApplicationHelper::GAUGE_CENTER %>" r="5" class="gauge-pivot" />
+    <% end %>
+  </svg>
+  <div class="gauge-readout">
+    <span class="tile-value"><%= value_text %></span>
+    <% if sub_text %>
+      <span class="tile-sub"><%= sub_text %></span>
+    <% end %>
+  </div>
+</div>

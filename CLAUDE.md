@@ -90,6 +90,29 @@ suite before committing changes to any reader, `SnapshotCollector`, or
 `DashboardQuery` — the delta math (first-poll-ever and counter-reset edge
 cases) is the most fragile part of this codebase.
 
+**The production service doesn't hot-reload — you must restart it to see
+changes:** this machine normally runs its own dashboard as a live systemd
+service (`systemctl is-active pi-dashboard`; installed by `bin/setup_server`,
+see below). `config/environments/production.rb` sets `eager_load = true`, so
+that already-running process has every view, helper, and controller loaded
+and cached in memory from whenever it last booted — editing files on disk
+(even `bin/rails runner`-verified changes) has zero effect on what it serves
+until it restarts, and neither does a browser hard-reload/cache-clear, since
+the server itself is what's stale, not the client. Propshaft-compiled
+CSS/JS (`public/assets/*-<digest>.css`) are equally frozen: precompiling
+regenerates the files but the *referenced* digest in already-rendered pages
+won't change until the process restarts either. After editing anything
+under `app/` or `app/assets/`, apply it with:
+
+```sh
+RAILS_ENV=production bin/rails assets:precompile
+sudo systemctl restart pi-dashboard
+```
+
+(a few seconds of downtime while Puma reboots). This is exactly what
+re-running `bin/setup_server` does, so that's also an option if you also
+need its other idempotent steps (bundle install, db:prepare, etc).
+
 **Deployment templating:** `deploy/pi-dashboard.service.example` is a
 `{{PLACEHOLDER}}`-templated systemd unit, filled in and installed by
 `bin/setup_server` (or by hand — see README). `bin/setup_server` locates the
