@@ -167,7 +167,7 @@
     </section>
 
     <section class="charts" aria-label="Historical stats" data-controller="crosshair">
-      <details class="chart-group" open>
+      <details class="chart-group" open data-controller="collapse" data-collapse-id-value="cpu" data-action="toggle->collapse#toggle">
         <summary>
           <img src="/img/icon-cpu-light.png" alt="" class="section-icon icon-light">
           <img src="/img/icon-cpu-dark.png" alt="" class="section-icon icon-dark">
@@ -194,7 +194,7 @@
         </div>
       </details>
 
-      <details class="chart-group" open>
+      <details class="chart-group" open data-controller="collapse" data-collapse-id-value="memory" data-action="toggle->collapse#toggle">
         <summary>
           <img src="/img/icon-memory-light.png" alt="" class="section-icon icon-light">
           <img src="/img/icon-memory-dark.png" alt="" class="section-icon icon-dark">
@@ -216,7 +216,7 @@
         </div>
       </details>
 
-      <details class="chart-group" open>
+      <details class="chart-group" open data-controller="collapse" data-collapse-id-value="disk" data-action="toggle->collapse#toggle">
         <summary>
           <img src="/img/icon-disk-light.png" alt="" class="section-icon icon-light">
           <img src="/img/icon-disk-dark.png" alt="" class="section-icon icon-dark">
@@ -232,7 +232,7 @@
         </div>
       </details>
 
-      <details class="chart-group" open>
+      <details class="chart-group" open data-controller="collapse" data-collapse-id-value="networking" data-action="toggle->collapse#toggle">
         <summary>
           <img src="/img/icon-network-light.png" alt="" class="section-icon icon-light">
           <img src="/img/icon-network-dark.png" alt="" class="section-icon icon-dark">
