@@ -168,7 +168,11 @@
 
     <section class="charts" aria-label="Historical stats" data-controller="crosshair">
       <details class="chart-group" open>
-        <summary>CPU</summary>
+        <summary>
+          <img src="/img/icon-cpu-light.png" alt="" class="section-icon icon-light">
+          <img src="/img/icon-cpu-dark.png" alt="" class="section-icon icon-dark">
+          CPU
+        </summary>
         <div class="chart-group-body">
           <div class="chart-card">
             <h2>CPU usage</h2>
@@ -191,7 +195,11 @@
       </details>
 
       <details class="chart-group" open>
-        <summary>Memory</summary>
+        <summary>
+          <img src="/img/icon-memory-light.png" alt="" class="section-icon icon-light">
+          <img src="/img/icon-memory-dark.png" alt="" class="section-icon icon-dark">
+          Memory
+        </summary>
         <div class="chart-group-body">
           <div class="chart-card">
             <h2>Memory usage</h2>
@@ -209,7 +217,11 @@
       </details>
 
       <details class="chart-group" open>
-        <summary>Disk</summary>
+        <summary>
+          <img src="/img/icon-disk-light.png" alt="" class="section-icon icon-light">
+          <img src="/img/icon-disk-dark.png" alt="" class="section-icon icon-dark">
+          Disk
+        </summary>
         <div class="chart-group-body">
           <% @query.disk_series_by_mount_point.each do |mount_point, series| %>
             <div class="chart-card">
@@ -221,7 +233,11 @@
       </details>
 
       <details class="chart-group" open>
-        <summary>Networking</summary>
+        <summary>
+          <img src="/img/icon-network-light.png" alt="" class="section-icon icon-light">
+          <img src="/img/icon-network-dark.png" alt="" class="section-icon icon-dark">
+          Networking
+        </summary>
         <div class="chart-group-body">
           <% @query.network_series_by_interface.each do |interface, series| %>
             <% if wifi_disconnected?(interface, @wifi_status) %>

@@ -49,6 +49,32 @@
   --border: #3a3a3a;
 }
 
+/* Each section icon ships as two PNGs (public/img/icon-*-light.png /
+   -dark.png) baked with a fixed stroke color rather than a CSS variable, so
+   swapping which file is visible has to follow the same
+   :root[data-theme]/media-query pattern as the color variables above. */
+.icon-dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .icon-light {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .icon-dark {
+    display: inline-block;
+  }
+}
+
+:root[data-theme="dark"] .icon-light {
+  display: none;
+}
+
+:root[data-theme="dark"] .icon-dark {
+  display: inline-block;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -319,6 +345,12 @@ body {
 /* hide the native disclosure triangle so our own marker is the only one */
 .chart-group summary::-webkit-details-marker {
   display: none;
+}
+
+.section-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
 }
 
 .chart-group summary::before {
